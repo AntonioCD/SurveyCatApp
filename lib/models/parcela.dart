@@ -17,7 +17,7 @@ class Parcela {
   Parcela.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     codEnc = json['codEnc'];
-    areaEstimada = json['areaEstimada'];
+    areaEstimada = _checkDouble(json['areaEstimada']);
     presentaConflicto = json['presenta_Conflicto'];
     fechaEnc = json['fecha_Enc'];
     propietariosCount = json['propietariosCount'];
@@ -32,5 +32,13 @@ class Parcela {
     data['fecha_Enc'] = this.fechaEnc;
     data['propietariosCount'] = this.propietariosCount;
     return data;
+  }
+
+  static double _checkDouble(dynamic value) {
+    if (value is int) {
+      return value.toDouble();
+    } else {
+      return value;
+    }
   }
 }

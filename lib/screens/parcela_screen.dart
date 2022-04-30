@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -39,7 +40,11 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             ? LoaderComponent(
                 text: 'Por favor espere...',
               )
-            : Text('Parcelas'),
+            : _getContent(),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {},
       ),
     );
   }
@@ -70,5 +75,47 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     }
 
     print(_parcelas);
+  }
+
+  Widget _getContent() {
+    return _parcelas.length == 0 ? _noContent() : _getListView();
+  }
+
+  Widget _noContent() {
+    return Center(
+      child: Container(
+        margin: EdgeInsets.all(20),
+        child: Text(
+          'No hay Encuestas almacenadas.',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  Widget _getListView() {
+    return ListView(
+      children: _parcelas.map((e) {
+        return Card(
+          child: InkWell(
+            onTap: () {},
+            child: Container(
+              margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    e.codEnc,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Icon(Icons.arrow_circle_right),
+                ],
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
   }
 }

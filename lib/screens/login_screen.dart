@@ -17,7 +17,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  String _email = 'cd.oscar@gmail.com';
+  String _email = 'ernesto.medina@ineter.gob.ni';
   String _emailError = '';
   bool _emailShowError = false;
 

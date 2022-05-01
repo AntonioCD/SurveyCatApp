@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:surveycat_app/models/token.dart';
 import 'package:surveycat_app/screens/login_screen.dart';
-import 'package:surveycat_app/screens/parcela_screen.dart';
+import 'package:surveycat_app/screens/parcelas_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Token token;
@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ParcelaScreen(
+                builder: (context) => ParcelasScreen(
                   token: widget.token,
                 ),
               ),

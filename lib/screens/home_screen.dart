@@ -18,7 +18,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('SurveyCat')),
+      backgroundColor: Color.fromARGB(8, 15, 15, 15),
+      appBar: AppBar(
+        title: Text('SurveyCat'),
+        backgroundColor: Color.fromARGB(255, 11, 131, 0),
+      ),
       body: _getBody(),
       drawer: widget.token.user.userType == 0
           ? _getAdminMenu()

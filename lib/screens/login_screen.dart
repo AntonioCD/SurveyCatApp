@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 18, 14, 67),
+      backgroundColor: Color.fromARGB(255, 15, 15, 15),
       body: SafeArea(
         child: Stack(
           children: <Widget>[
@@ -139,13 +139,20 @@ class _LoginScreenState extends State<LoginScreen> {
       padding: EdgeInsets.symmetric(horizontal: 50.0, vertical: 10.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-            textStyle: const TextStyle(fontSize: 20),
-            primary: Colors.deepPurple[700]),
+          textStyle: const TextStyle(fontSize: 20),
+          primary: Color.fromARGB(255, 11, 131, 0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+        ),
         onPressed: () => _login(),
         child: Container(
           height: 50,
           alignment: Alignment.center,
-          child: Text("Iniciar Sesión"),
+          child: Text(
+            "Iniciar Sesión",
+            style: TextStyle(color: Colors.grey[100]),
+          ),
         ),
       ),
     );

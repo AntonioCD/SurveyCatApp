@@ -1,15 +1,13 @@
 // ignore_for_file: prefer_const_constructors
-import 'dart:async';
-import 'dart:convert';
-import 'package:flutter/foundation.dart';
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:surveycat_app/components/loader_component.dart';
+import 'package:surveycat_app/helpers/api_helper.dart';
 import 'package:surveycat_app/models/parcela.dart';
+import 'package:surveycat_app/models/response.dart';
 import 'package:surveycat_app/models/token.dart';
 import 'package:surveycat_app/screens/parcela_screen.dart';
-import '../helpers/constants.dart';
 
 class ParcelasScreen extends StatefulWidget {
   final Token token;
@@ -33,8 +31,10 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 15, 15, 15),
       appBar: AppBar(
         title: Text('Parcelas'),
+        backgroundColor: Color.fromARGB(255, 11, 131, 0),
       ),
       body: Center(
         child: _showLoader
@@ -69,28 +69,27 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
     setState(() {
       _showLoader = true;
     });
-    var url = Uri.parse('${Constants.apiUrl}/api/Parcelas');
-    var response = await http.get(
-      url,
-      headers: {
-        'content-type': 'application/json',
-        'accept': 'application/json',
-        'authorization': 'bearer ${widget.token.token}',
-      },
-    );
+
+    Response response = await ApiHelper.getParcelas(widget.token.token);
+
     setState(() {
       _showLoader = false;
     });
 
-    var body = response.body;
-    var decodedJson = jsonDecode(body);
-    if (decodedJson != null) {
-      for (var item in decodedJson) {
-        _parcelas.add(Parcela.fromJson(item));
-      }
+    if (!response.isSuccess) {
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: response.message,
+          actions: <AlertDialogAction>[
+            AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return;
     }
 
-    print(_parcelas);
+    setState(() {
+      _parcelas = response.result;
+    });
   }
 
   Widget _getContent() {
@@ -102,7 +101,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
       child: Container(
         margin: EdgeInsets.all(20),
         child: Text(
-          'No hay Encuestas almacenadas.',
+          'No hay parcelas almacenadas.',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
@@ -133,7 +132,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                 children: [
                   Text(
                     e.codEnc,
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 20),
                   ),
                   Icon(Icons.arrow_circle_right),
                 ],

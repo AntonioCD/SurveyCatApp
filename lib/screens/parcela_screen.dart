@@ -1,9 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_titled_container/flutter_titled_container.dart';
+import 'package:surveycat_app/components/loader_component.dart';
+import 'package:surveycat_app/helpers/api_helper.dart';
 
 import 'package:surveycat_app/models/parcela.dart';
+import 'package:surveycat_app/models/response.dart';
 import 'package:surveycat_app/models/token.dart';
 
 class ParcelaScreen extends StatefulWidget {
@@ -17,6 +21,8 @@ class ParcelaScreen extends StatefulWidget {
 }
 
 class _ParcelaScreenState extends State<ParcelaScreen> {
+  bool _showLoader = false;
+
   String _codenc = '';
   String _codencError = '';
   bool _codencShowError = false;
@@ -45,113 +51,124 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color.fromARGB(255, 15, 15, 15),
-        appBar: AppBar(
-          title: Text(
-              widget.parcela.id == 0 ? 'Nueva Parcela' : widget.parcela.codEnc),
-          backgroundColor: Color.fromARGB(255, 11, 131, 0),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-          child: ListView(
-            padding: EdgeInsets.only(top: 15.0),
-            children: <Widget>[
-              TitledContainer(
-                titleColor: Colors.white,
-                title: 'Generales Encuesta',
-                textAlign: TextAlignTitledContainer.Left,
-                fontSize: 20.0,
-                backgroundColor: Color.fromARGB(255, 15, 15, 15),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 2.0),
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+      backgroundColor: Color.fromARGB(255, 15, 15, 15),
+      appBar: AppBar(
+        title: Text(
+            widget.parcela.id == 0 ? 'Nueva Encuesta' : widget.parcela.codEnc),
+        backgroundColor: Color.fromARGB(255, 138, 0, 0),
+      ),
+      body: Stack(
+        children: [
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+            child: ListView(
+              padding: EdgeInsets.only(top: 15.0),
+              children: <Widget>[
+                TitledContainer(
+                  titleColor: Colors.white,
+                  title: 'Datos Generales Encuesta',
+                  textAlign: TextAlignTitledContainer.Left,
+                  fontSize: 20.0,
+                  backgroundColor: Color.fromARGB(255, 15, 15, 15),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 2.0),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _showDepartamento(),
+                          _showMunicipio(),
+                          _showCodEnc(),
+                        ]),
                   ),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _showDepartamento(),
-                        _showMunicipio(),
-                        _showCodEnc(),
-                      ]),
                 ),
-              ),
-              SizedBox(height: 20),
-              TitledContainer(
-                titleColor: Colors.white,
-                title: 'Datos del Inmueble',
-                textAlign: TextAlignTitledContainer.Left,
-                fontSize: 20.0,
-                backgroundColor: Color.fromARGB(255, 15, 15, 15),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 2.0),
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                SizedBox(height: 20),
+                TitledContainer(
+                  titleColor: Colors.white,
+                  title: 'Datos del Inmueble',
+                  textAlign: TextAlignTitledContainer.Left,
+                  fontSize: 20.0,
+                  backgroundColor: Color.fromARGB(255, 15, 15, 15),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 2.0),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _showNombreFinca(),
+                          _showAreaEstimada(),
+                        ]),
                   ),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _showNombreFinca(),
-                        _showAreaEstimada(),
-                      ]),
                 ),
-              ),
-              SizedBox(height: 20),
-              TitledContainer(
-                titleColor: Colors.white,
-                title: 'Datos del Entrevistado',
-                textAlign: TextAlignTitledContainer.Left,
-                fontSize: 20.0,
-                backgroundColor: Color.fromARGB(255, 15, 15, 15),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 2.0),
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                SizedBox(height: 20),
+                TitledContainer(
+                  titleColor: Colors.white,
+                  title: 'Datos del Entrevistado',
+                  textAlign: TextAlignTitledContainer.Left,
+                  fontSize: 20.0,
+                  backgroundColor: Color.fromARGB(255, 15, 15, 15),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 2.0),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Expanded(
+                                child: _showInformantePrimerNombre(),
+                              ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: _showInformanteSegundoNombre(),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Expanded(
+                                child: _showInformantePrimerApellido(),
+                              ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: _showInformanteSegundoApellido(),
+                              ),
+                            ],
+                          ),
+                        ]),
                   ),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Expanded(
-                              child: _showInformantePrimerNombre(),
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: _showInformanteSegundoNombre(),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Expanded(
-                              child: _showInformantePrimerApellido(),
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: _showInformanteSegundoApellido(),
-                            ),
-                          ],
-                        ),
-                      ]),
                 ),
-              ),
-              _showButtons(),
-            ],
+                _showButtons(),
+              ],
+            ),
           ),
-        ));
+          _showLoader
+              ? LoaderComponent(
+                  text: 'Por favor espere...',
+                )
+              : Container(),
+        ],
+      ),
+    );
   }
 
   Widget _showDepartamento() {
     return Container(
       padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
       child: TextField(
-        controller: _encuestadorController,
+        //controller: _encuestadorController,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
@@ -160,7 +177,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Departamento',
-          errorText: _codencShowError ? _codencError : null,
+          //errorText: _codencShowError ? _codencError : null,
         ),
         onChanged: (value) {
           _codenc = value;
@@ -173,7 +190,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     return Container(
       padding: EdgeInsets.only(bottom: 10.0),
       child: TextField(
-        controller: _encuestadorController,
+        //controller: _encuestadorController,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
@@ -182,7 +199,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Municipio',
-          errorText: _codencShowError ? _codencError : null,
+          //errorText: _codencShowError ? _codencError : null,
         ),
         onChanged: (value) {
           _codenc = value;
@@ -218,7 +235,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     return Container(
       padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
       child: TextField(
-        controller: _encuestadorController,
+        //controller: _encuestadorController,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
@@ -227,7 +244,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Nombre de la Finca',
-          errorText: _codencShowError ? _codencError : null,
+          //errorText: _codencShowError ? _codencError : null,
         ),
         onChanged: (value) {
           _codenc = value;
@@ -249,7 +266,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Fecha de Encuesta',
-          errorText: _codencShowError ? _codencError : null,
+          //errorText: _codencShowError ? _codencError : null,
         ),
         onChanged: (value) {
           _codenc = value;
@@ -271,7 +288,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Encuestador',
-          errorText: _codencShowError ? _codencError : null,
+          //errorText: _codencShowError ? _codencError : null,
         ),
         onChanged: (value) {
           _codenc = value;
@@ -293,7 +310,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Cordinador de Brigada',
-          errorText: _codencShowError ? _codencError : null,
+          //errorText: _codencShowError ? _codencError : null,
         ),
         onChanged: (value) {
           _codenc = value;
@@ -315,7 +332,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Tecnico Catastral',
-          errorText: _codencShowError ? _codencError : null,
+          //errorText: _codencShowError ? _codencError : null,
         ),
         onChanged: (value) {
           _codenc = value;
@@ -361,7 +378,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Primer Nombre',
-          errorText: _codencShowError ? _codencError : null,
+          //errorText: _codencShowError ? _codencError : null,
         ),
         onChanged: (value) {
           _codenc = value;
@@ -383,7 +400,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Segundo Nombre',
-          errorText: _codencShowError ? _codencError : null,
+          //errorText: _codencShowError ? _codencError : null,
         ),
         onChanged: (value) {
           _codenc = value;
@@ -405,7 +422,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Primer Apellido',
-          errorText: _codencShowError ? _codencError : null,
+          //errorText: _codencShowError ? _codencError : null,
         ),
         onChanged: (value) {
           _codenc = value;
@@ -427,7 +444,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Segundo Apellido',
-          errorText: _codencShowError ? _codencError : null,
+          //errorText: _codencShowError ? _codencError : null,
         ),
         onChanged: (value) {
           _codenc = value;
@@ -438,16 +455,16 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
 
   Widget _showButtons() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 50.0, vertical: 10.0),
+      padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           textStyle: const TextStyle(fontSize: 20),
-          primary: Color.fromARGB(255, 11, 131, 0),
+          primary: Color.fromARGB(255, 138, 0, 0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
-        onPressed: () {},
+        onPressed: () => _save(),
         child: Container(
           height: 50,
           alignment: Alignment.center,
@@ -458,5 +475,106 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
         ),
       ),
     );
+  }
+
+  void _save() {
+    if (!_validateFields()) {
+      return;
+    }
+
+    widget.parcela.id == 0 ? _addRecord() : _saveRecord();
+  }
+
+  bool _validateFields() {
+    bool isValid = true;
+
+    if (_codenc.isEmpty) {
+      isValid = false;
+      _codencShowError = true;
+      _codencError = 'Debes ingresar el Código de Encuesta';
+    } else {
+      _codencShowError = false;
+    }
+
+    if (_codenc.isEmpty) {
+      isValid = false;
+      _areaEstimadaShowError = true;
+      _areaEstimadaError = 'Debes un area mayor o igual a 0';
+    } else {
+      double areaEstimada = double.parse(_areaEstimada);
+      if (areaEstimada < 0) {
+        isValid = false;
+        _areaEstimadaShowError = true;
+        _areaEstimadaError = 'Debes un area mayor o igual a 0';
+      } else {
+        _areaEstimadaShowError = false;
+      }
+    }
+
+    setState(() {});
+    return isValid;
+  }
+
+  _addRecord() async {
+    setState(() {
+      _showLoader = true;
+    });
+
+    Map<String, dynamic> request = {
+      'codEnc': _codenc,
+      'areaEstimada': double.parse(_areaEstimada),
+    };
+
+    Response response =
+        await ApiHelper.post('/api/Parcelas/', request, widget.token.token);
+
+    setState(() {
+      _showLoader = false;
+    });
+
+    if (!response.isSuccess) {
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: response.message,
+          actions: <AlertDialogAction>[
+            AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return;
+    }
+
+    Navigator.pop(context);
+  }
+
+  _saveRecord() async {
+    setState(() {
+      _showLoader = true;
+    });
+
+    Map<String, dynamic> request = {
+      'id': widget.parcela.id,
+      'codEnc': _codenc,
+      'areaEstimada': double.parse(_areaEstimada),
+    };
+
+    Response response = await ApiHelper.put('/api/Parcelas/',
+        widget.parcela.id.toString(), request, widget.token.token);
+
+    setState(() {
+      _showLoader = false;
+    });
+
+    if (!response.isSuccess) {
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: response.message,
+          actions: <AlertDialogAction>[
+            AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return;
+    }
+
+    Navigator.pop(context);
   }
 }

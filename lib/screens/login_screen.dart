@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           textStyle: const TextStyle(fontSize: 20),
-          primary: Color.fromARGB(255, 11, 131, 0),
+          primary: Color.fromARGB(255, 138, 0, 0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
@@ -231,7 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _passwordShowError = true;
       _passwordError = 'Debes ingresar tu Contraseña';
     } else {
-      _emailShowError = false;
+      _passwordShowError = false;
     }
 
     setState(() {});

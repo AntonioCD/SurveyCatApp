@@ -21,6 +21,8 @@ class ParcelasScreen extends StatefulWidget {
 class _ParcelasScreenState extends State<ParcelasScreen> {
   List<Parcela> _parcelas = [];
   bool _showLoader = false;
+  bool _isFiltered = false;
+  String _search = '';
 
   @override
   void initState() {
@@ -33,8 +35,15 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 15, 15, 15),
       appBar: AppBar(
-        title: Text('Parcelas'),
-        backgroundColor: Color.fromARGB(255, 11, 131, 0),
+        title: Text('Mis Encuestas'),
+        backgroundColor: Color.fromARGB(255, 138, 0, 0),
+        actions: <Widget>[
+          _isFiltered
+              ? IconButton(
+                  onPressed: _removeFilter, icon: Icon(Icons.filter_alt))
+              : IconButton(
+                  onPressed: _showFilter, icon: Icon(Icons.filter_list)),
+        ],
       ),
       body: Center(
         child: _showLoader
@@ -101,7 +110,9 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
       child: Container(
         margin: EdgeInsets.all(20),
         child: Text(
-          'No hay parcelas almacenadas.',
+          _isFiltered
+              ? 'No hay Encuestas con ese criterio de busqueda'
+              : 'No hay parcelas registradas.',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
@@ -142,5 +153,67 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
         );
       }).toList(),
     );
+  }
+
+  void _showFilter() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            title: Text('Filtrar Encuestas'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text('Escriba los primeros digitos del Código de Encuesta'),
+                SizedBox(height: 10),
+                TextField(
+                  autofocus: true,
+                  decoration: InputDecoration(
+                      hintText: 'Criterio de búsqueda',
+                      labelText: 'Buscar',
+                      suffixIcon: Icon(Icons.search)),
+                  onChanged: (value) {
+                    _search = value;
+                  },
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('Cancelar')),
+              TextButton(onPressed: () => _filter(), child: Text('Filtrar'))
+            ],
+          );
+        });
+  }
+
+  void _removeFilter() {
+    setState(() {
+      _isFiltered = false;
+    });
+    _getParcelas();
+  }
+
+  void _filter() {
+    if (_search.isEmpty) {
+      return;
+    }
+
+    List<Parcela> filteredList = [];
+    for (var parcela in _parcelas) {
+      if (parcela.codEnc.toLowerCase().contains(_search.toLowerCase())) {
+        filteredList.add(parcela);
+      }
+    }
+
+    setState(() {
+      _parcelas = filteredList;
+      _isFiltered = true;
+    });
+
+    Navigator.of(context).pop();
   }
 }

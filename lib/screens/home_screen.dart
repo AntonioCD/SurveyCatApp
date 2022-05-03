@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Color.fromARGB(8, 15, 15, 15),
       appBar: AppBar(
         title: Text('SurveyCat'),
-        backgroundColor: Color.fromARGB(255, 11, 131, 0),
+        backgroundColor: Color.fromARGB(255, 138, 0, 0),
       ),
       body: _getBody(),
       drawer: widget.token.user.userType == 0

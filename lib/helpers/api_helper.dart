@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:surveycat_app/models/parcela.dart';
 
 import 'package:surveycat_app/models/response.dart';
+import '../models/user.dart';
 import 'constants.dart';
 
 class ApiHelper {
@@ -27,6 +28,33 @@ class ApiHelper {
     if (decodedJson != null) {
       for (var item in decodedJson) {
         list.add(Parcela.fromJson(item));
+      }
+    }
+
+    return Response(isSuccess: true, result: list);
+  }
+
+  static Future<Response> getUsers(String token) async {
+    var url = Uri.parse('${Constants.apiUrl}/api/Users');
+    var response = await http.get(
+      url,
+      headers: {
+        'content-type': 'application/json',
+        'accept': 'application/json',
+        'authorization': 'bearer $token',
+      },
+    );
+
+    var body = response.body;
+    if (response.statusCode >= 400) {
+      return Response(isSuccess: false, message: body);
+    }
+
+    List<User> list = [];
+    var decodedJson = jsonDecode(body);
+    if (decodedJson != null) {
+      for (var item in decodedJson) {
+        list.add(User.fromJson(item));
       }
     }
 

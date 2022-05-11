@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           textStyle: const TextStyle(fontSize: 20),
-          primary: Color.fromARGB(255, 138, 0, 0),
+          primary: Color.fromARGB(255, 0, 133, 138),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),

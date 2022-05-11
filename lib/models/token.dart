@@ -12,6 +12,7 @@ class Token {
       imageFullPath: '',
       userType: 0,
       fullName: '',
+      parcelas: [],
       parcelasCount: 0,
       id: '',
       userName: '',

@@ -1,10 +1,12 @@
+import 'package:surveycat_app/models/propietario.dart';
+
 class Parcela {
   int id = 0;
   String codEnc = '';
   double areaEstimada = 0;
   bool presentaConflicto = false;
   String fechaEnc = '';
-  int propietariosCount = 0;
+  List<Propietario> propietarios = [];
 
   Parcela(
       {required this.id,
@@ -12,7 +14,7 @@ class Parcela {
       required this.areaEstimada,
       required this.presentaConflicto,
       required this.fechaEnc,
-      required this.propietariosCount});
+      required this.propietarios});
 
   Parcela.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -20,7 +22,12 @@ class Parcela {
     areaEstimada = _checkDouble(json['areaEstimada']);
     presentaConflicto = json['presenta_Conflicto'];
     fechaEnc = json['fecha_Enc'];
-    propietariosCount = json['propietariosCount'];
+    if (json['propietarios'] != null) {
+      propietarios = [];
+      json['propietarios'].forEach((v) {
+        propietarios.add(new Propietario.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -30,7 +37,7 @@ class Parcela {
     data['areaEstimada'] = this.areaEstimada;
     data['presenta_Conflicto'] = this.presentaConflicto;
     data['fecha_Enc'] = this.fechaEnc;
-    data['propietariosCount'] = this.propietariosCount;
+    data['propietarios'] = this.propietarios.map((v) => v.toJson()).toList();
     return data;
   }
 

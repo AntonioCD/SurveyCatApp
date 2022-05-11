@@ -1,3 +1,5 @@
+import 'package:surveycat_app/models/parcela.dart';
+
 class User {
   String? nombres = '';
   String? apellidos = '';
@@ -7,6 +9,7 @@ class User {
   String? imageFullPath = '';
   int? userType = 0;
   String? fullName = '';
+  List<Parcela> parcelas = [];
   int? parcelasCount = 0;
   String? id = '';
   String? userName = '';
@@ -22,6 +25,7 @@ class User {
     required this.imageFullPath,
     required this.userType,
     required this.fullName,
+    required this.parcelas,
     required this.parcelasCount,
     required this.id,
     required this.userName,
@@ -38,6 +42,12 @@ class User {
     imageFullPath = json['imageFullPath'];
     userType = json['userType'];
     fullName = json['fullName'];
+    if (json['parcelas'] != null) {
+      parcelas = [];
+      json['parcelas'].forEach((v) {
+        parcelas.add(new Parcela.fromJson(v));
+      });
+    }
     parcelasCount = json['parcelasCount'];
     id = json['id'];
     userName = json['userName'];
@@ -55,6 +65,7 @@ class User {
     data['imageFullPath'] = this.imageFullPath;
     data['userType'] = this.userType;
     data['fullName'] = this.fullName;
+    data['parcelas'] = this.parcelas.map((v) => v.toJson()).toList();
     data['parcelasCount'] = this.parcelasCount;
     data['id'] = this.id;
     data['userName'] = this.userName;

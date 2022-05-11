@@ -36,7 +36,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
       backgroundColor: Color.fromARGB(255, 15, 15, 15),
       appBar: AppBar(
         title: Text('Mis Encuestas'),
-        backgroundColor: Color.fromARGB(255, 138, 0, 0),
+        backgroundColor: Color.fromARGB(255, 0, 133, 138),
         actions: <Widget>[
           _isFiltered
               ? IconButton(
@@ -55,26 +55,13 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ParcelaScreen(
-                  token: widget.token,
-                  parcela: Parcela(
-                      id: 0,
-                      codEnc: '',
-                      areaEstimada: 0,
-                      presentaConflicto: false,
-                      fechaEnc: '',
-                      propietariosCount: 0)),
-            ),
-          );
+          _goAdd();
         },
       ),
     );
   }
 
-  void _getParcelas() async {
+  Future<Null> _getParcelas() async {
     setState(() {
       _showLoader = true;
     });
@@ -120,38 +107,33 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
   }
 
   Widget _getListView() {
-    return ListView(
-      children: _parcelas.map((e) {
-        return Card(
-          child: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ParcelaScreen(
-                    token: widget.token,
-                    parcela: e,
-                  ),
+    return RefreshIndicator(
+      onRefresh: _getParcelas,
+      child: ListView(
+        children: _parcelas.map((e) {
+          return Card(
+            child: InkWell(
+              onTap: () {
+                _goEdit(e);
+              },
+              child: Container(
+                margin: EdgeInsets.all(10),
+                padding: EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      e.codEnc,
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    Icon(Icons.arrow_circle_right),
+                  ],
                 ),
-              );
-            },
-            child: Container(
-              margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    e.codEnc,
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Icon(Icons.arrow_circle_right),
-                ],
               ),
             ),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 
@@ -215,5 +197,42 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
     });
 
     Navigator.of(context).pop();
+  }
+
+  void _goAdd() async {
+    String? result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ParcelaScreen(
+            token: widget.token,
+            parcela: Parcela(
+                id: 0,
+                codEnc: '',
+                areaEstimada: 0,
+                presentaConflicto: false,
+                fechaEnc: '',
+                propietarios: [])),
+      ),
+    );
+
+    if (result == 'yes') {
+      _getParcelas();
+    }
+  }
+
+  void _goEdit(Parcela parcela) async {
+    String? result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ParcelaScreen(
+          token: widget.token,
+          parcela: parcela,
+        ),
+      ),
+    );
+
+    if (result == 'yes') {
+      _getParcelas();
+    }
   }
 }

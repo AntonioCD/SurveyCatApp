@@ -55,7 +55,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
       appBar: AppBar(
         title: Text(
             widget.parcela.id == 0 ? 'Nueva Encuesta' : widget.parcela.codEnc),
-        backgroundColor: Color.fromARGB(255, 138, 0, 0),
+        backgroundColor: Color.fromARGB(255, 0, 133, 138),
       ),
       body: Stack(
         children: [
@@ -459,7 +459,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           textStyle: const TextStyle(fontSize: 20),
-          primary: Color.fromARGB(255, 138, 0, 0),
+          primary: Color.fromARGB(255, 0, 133, 138),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
@@ -543,7 +543,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
       return;
     }
 
-    Navigator.pop(context);
+    Navigator.pop(context, 'yes');
   }
 
   _saveRecord() async {
@@ -575,6 +575,6 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
       return;
     }
 
-    Navigator.pop(context);
+    Navigator.pop(context, 'yes');
   }
 }

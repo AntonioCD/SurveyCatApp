@@ -11,7 +11,7 @@ class User {
   String? fullName = '';
   List<Parcela> parcelas = [];
   int? parcelasCount = 0;
-  String? id = '';
+  String id = '';
   String? userName = '';
   String? email = '';
   String? phoneNumber = '';

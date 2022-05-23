@@ -1,8 +1,11 @@
 // ignore_for_file: prefer_const_constructors, import_of_legacy_library_into_null_safe
+import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:surveycat_app/components/loader_component.dart';
 import 'package:surveycat_app/helpers/constants.dart';
@@ -17,11 +20,11 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  String _email = 'ernesto.medina@ineter.gob.ni';
+  String _email = '';
   String _emailError = '';
   bool _emailShowError = false;
 
-  String _password = '123456';
+  String _password = '';
   String _passwordError = '';
   bool _passwordShowError = false;
 
@@ -45,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(fontSize: 35, color: Colors.white)), */
                 _showEmail(),
                 _showPassword(),
-                /*   _showRememberme(), */
+                _showRememberme(),
                 SizedBox(height: 10),
                 _showButtons(),
               ],
@@ -63,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _showLogo() {
     return Image(
-      image: AssetImage('assets/gpsLogo.png'),
+      image: AssetImage('assets/gpslogo.png'),
       width: 300,
     );
   }
@@ -119,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _showRememberme() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+      padding: const EdgeInsets.symmetric(horizontal: 35.0, vertical: 0.0),
       child: CheckboxListTile(
           title: Text(
             'Recordarme',
@@ -171,6 +174,23 @@ class _LoginScreenState extends State<LoginScreen> {
       _showLoader = true;
     });
 
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        _showLoader = false;
+      });
+
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: 'Verifica tu conexión a Internet.',
+          actions: <AlertDialogAction>[
+            AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+
+      return;
+    }
+
     Map<String, dynamic> request = {
       'Username': _email,
       'Password': _password,
@@ -199,6 +219,11 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     var body = response.body;
+
+    if (_rememberme) {
+      _storeUser(body);
+    }
+
     var decodedJson = jsonDecode(body);
     var token = Token.fromJson(decodedJson);
     Navigator.pushReplacement(
@@ -236,5 +261,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() {});
     return isValid;
+  }
+
+  void _storeUser(String body) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isRemembered', true);
+    await prefs.setString('userBody', body);
   }
 }

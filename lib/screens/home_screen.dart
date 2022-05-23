@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:surveycat_app/models/token.dart';
 import 'package:surveycat_app/screens/login_screen.dart';
 import 'package:surveycat_app/screens/parcelas_screen.dart';
@@ -41,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ListView(padding: EdgeInsets.zero, children: <Widget>[
         DrawerHeader(
           child: Image(
-            image: AssetImage('assets/gpsLogo.png'),
+            image: AssetImage('assets/gpslogo.png'),
           ),
         ),
         ListTile(
@@ -64,14 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ListTile(
           leading: Icon(Icons.transit_enterexit),
           title: Text('Cerrar Sesión'),
-          onTap: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LoginScreen(),
-              ),
-            );
-          },
+          onTap: () => _logOut(),
         ),
       ]),
     );
@@ -82,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ListView(padding: EdgeInsets.zero, children: <Widget>[
         DrawerHeader(
           child: Image(
-            image: AssetImage('assets/gpsLogo.png'),
+            image: AssetImage('assets/gpslogo.png'),
           ),
         ),
         ListTile(
@@ -114,16 +108,22 @@ class _HomeScreenState extends State<HomeScreen> {
         ListTile(
           leading: Icon(Icons.transit_enterexit),
           title: Text('Cerrar Sesión'),
-          onTap: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LoginScreen(),
-              ),
-            );
-          },
+          onTap: () => _logOut(),
         ),
       ]),
+    );
+  }
+
+  void _logOut() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isRemembered', false);
+    await prefs.setString('userBody', '');
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoginScreen(),
+      ),
     );
   }
 }

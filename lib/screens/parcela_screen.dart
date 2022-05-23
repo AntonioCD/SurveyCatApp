@@ -1,20 +1,28 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:ui';
+
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_titled_container/flutter_titled_container.dart';
 import 'package:surveycat_app/components/loader_component.dart';
 import 'package:surveycat_app/helpers/api_helper.dart';
 
+import 'package:surveycat_app/models/catDepartamento.dart';
+import 'package:surveycat_app/models/catMunicipio.dart';
 import 'package:surveycat_app/models/parcela.dart';
 import 'package:surveycat_app/models/response.dart';
 import 'package:surveycat_app/models/token.dart';
+import 'package:surveycat_app/models/user.dart';
 
 class ParcelaScreen extends StatefulWidget {
   final Token token;
+  final User user;
   final Parcela parcela;
 
-  ParcelaScreen({required this.token, required this.parcela});
+  ParcelaScreen(
+      {required this.token, required this.user, required this.parcela});
 
   @override
   State<ParcelaScreen> createState() => _ParcelaScreenState();
@@ -22,6 +30,16 @@ class ParcelaScreen extends StatefulWidget {
 
 class _ParcelaScreenState extends State<ParcelaScreen> {
   bool _showLoader = false;
+
+  String _departamentoCodDep = '0';
+  String _departamentoCodDepError = '';
+  bool _departamentoCodDepShowError = false;
+  List<CatDepartamento> _departamentos = [];
+
+  String _municipioCodMun = '0';
+  String _municipioCodMunError = '';
+  bool _municipioCodMunShowError = false;
+  List<CatDepartamento> _municipios = [];
 
   String _codenc = '';
   String _codencError = '';
@@ -38,9 +56,13 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
   bool _areaEstimadaShowError = false;
   TextEditingController _areaEstimadaController = TextEditingController();
 
+  bool _areaProtegida = false;
+
   @override
   void initState() {
     super.initState();
+
+    _getDepartamentos();
 
     _codenc = widget.parcela.codEnc;
     _codencController.text = _codenc;
@@ -63,93 +85,44 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             padding:
                 const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
             child: ListView(
-              padding: EdgeInsets.only(top: 15.0),
+              padding: EdgeInsets.only(top: 10.0),
               children: <Widget>[
-                TitledContainer(
-                  titleColor: Colors.white,
-                  title: 'Datos Generales Encuesta',
-                  textAlign: TextAlignTitledContainer.Left,
-                  fontSize: 20.0,
-                  backgroundColor: Color.fromARGB(255, 15, 15, 15),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white, width: 2.0),
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                    ),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _showDepartamento(),
-                          _showMunicipio(),
-                          _showCodEnc(),
-                        ]),
+                Container(
+                  margin: EdgeInsets.only(bottom: 10.0),
+                  child: Text(
+                    'DATOS GENERALES DE LA ENCUESTA',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white, fontSize: 20.0),
                   ),
                 ),
+                _showDepartamentoMunicipio(),
+                _showDepartamentos(),
+                _showMunicipios(),
+                _showSector(),
+                _showCodEnc(),
                 SizedBox(height: 20),
-                TitledContainer(
-                  titleColor: Colors.white,
-                  title: 'Datos del Inmueble',
-                  textAlign: TextAlignTitledContainer.Left,
-                  fontSize: 20.0,
-                  backgroundColor: Color.fromARGB(255, 15, 15, 15),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white, width: 2.0),
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                    ),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _showNombreFinca(),
-                          _showAreaEstimada(),
-                        ]),
+                Container(
+                  margin: EdgeInsets.only(bottom: 10.0),
+                  child: Text(
+                    'DATOS DEL INMUEBLE',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white, fontSize: 20.0),
                   ),
                 ),
+                _showTipoEncuestaChk(),
+                _showNombreFinca(),
+                _showUbicacionLabel(),
+                _showComarca(),
+                _showBarrioCaserio(),
+                _showManzanaLote(),
+                _showTipoUsoLabel(),
+                _showTipoUsoChk(),
+                _showDescripcion(),
+                _showAreaEstimada(),
+                _showOrigenTierraLabel(),
+                _showOrigenTierraChk(),
+                _showDatosEntrevistadoTitle(),
                 SizedBox(height: 20),
-                TitledContainer(
-                  titleColor: Colors.white,
-                  title: 'Datos del Entrevistado',
-                  textAlign: TextAlignTitledContainer.Left,
-                  fontSize: 20.0,
-                  backgroundColor: Color.fromARGB(255, 15, 15, 15),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white, width: 2.0),
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                    ),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Expanded(
-                                child: _showInformantePrimerNombre(),
-                              ),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: _showInformanteSegundoNombre(),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Expanded(
-                                child: _showInformantePrimerApellido(),
-                              ),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: _showInformanteSegundoApellido(),
-                              ),
-                            ],
-                          ),
-                        ]),
-                  ),
-                ),
                 _showButtons(),
               ],
             ),
@@ -164,31 +137,122 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     );
   }
 
-  Widget _showDepartamento() {
+  Widget _showDepartamentos() {
     return Container(
-      padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-      child: TextField(
-        //controller: _encuestadorController,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: Colors.grey[100],
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none,
+        margin: EdgeInsets.only(bottom: 10.0),
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(10)),
+        child: _departamentos.length == 0
+            ? Text('Cargando departamentos...')
+            : DropdownButtonFormField(
+                dropdownColor: Colors.white,
+                style: TextStyle(color: Colors.black),
+                items: _getComboDepartamentos(),
+                value: _departamentoCodDep,
+                onChanged: (option) {
+                  setState(() {
+                    _departamentoCodDep = option as String;
+                    _municipioCodMun = '0';
+                  });
+                },
+                decoration: InputDecoration(
+                  errorText: _departamentoCodDepShowError
+                      ? _departamentoCodDepError
+                      : null,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ));
+  }
+
+  List<DropdownMenuItem<String>> _getComboDepartamentos() {
+    List<DropdownMenuItem<String>> list = [];
+
+    list.add(DropdownMenuItem(
+      child: Text('Seleccione el departamento...'),
+      value: '0',
+    ));
+
+    _departamentos.forEach((catDepartamento) {
+      list.add(DropdownMenuItem(
+        child: Text(catDepartamento.departamento),
+        value: catDepartamento.codDep,
+      ));
+    });
+
+    return list;
+  }
+
+  Widget _showDepartamentoMunicipio() {
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Expanded(
+            child: _showDepartamentos(),
           ),
-          hintText: 'Departamento',
-          //errorText: _codencShowError ? _codencError : null,
-        ),
-        onChanged: (value) {
-          _codenc = value;
-        },
+          SizedBox(width: 10),
+          Expanded(
+            child: _showMunicipios(),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _showMunicipio() {
+  Widget _showMunicipios() {
     return Container(
-      padding: EdgeInsets.only(bottom: 10.0),
+        margin: EdgeInsets.only(bottom: 10.0),
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(10)),
+        child: _departamentos.length == 0
+            ? Text('Cargando municipios...')
+            : DropdownButtonFormField(
+                dropdownColor: Colors.white,
+                style: TextStyle(color: Colors.black),
+                items: _getComboMunicipios(_departamentoCodDep),
+                value: _municipioCodMun,
+                onChanged: (option) {
+                  setState(() {
+                    _municipioCodMun = option as String;
+                  });
+                },
+                decoration: InputDecoration(
+                  errorText:
+                      _municipioCodMunShowError ? _municipioCodMunError : null,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ));
+  }
+
+  List<DropdownMenuItem<String>> _getComboMunicipios(String _codDep) {
+    List<DropdownMenuItem<String>> list = [];
+
+    list.add(DropdownMenuItem(
+      child: Text('Seleccione el municipio...'),
+      value: '0',
+    ));
+
+    _departamentos.forEach((catDepartamento) {
+      catDepartamento.municipios
+          .where((x) => x.codDep == _codDep)
+          .forEach((catMunicipio) {
+        list.add(DropdownMenuItem(
+          child: Text(catMunicipio.municipio),
+          value: catMunicipio.codMun,
+        ));
+      });
+    });
+
+    return list;
+  }
+
+  Widget _showSector() {
+    return Container(
+      margin: EdgeInsets.only(bottom: 10.0),
       child: TextField(
         //controller: _encuestadorController,
         decoration: InputDecoration(
@@ -198,7 +262,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
           ),
-          hintText: 'Municipio',
+          hintText: 'Sector',
           //errorText: _codencShowError ? _codencError : null,
         ),
         onChanged: (value) {
@@ -210,7 +274,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
 
   Widget _showCodEnc() {
     return Container(
-      padding: EdgeInsets.only(bottom: 10.0),
+      padding: EdgeInsets.only(bottom: 0.0),
       child: TextField(
         autofocus: true,
         controller: _codencController,
@@ -231,9 +295,29 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     );
   }
 
+  Widget _showTipoEncuestaChk() {
+    return Container(
+      margin: EdgeInsets.only(top: 0.0, bottom: 10.0),
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(10)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Expanded(
+            child: _showAreaProtegidaChk(),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: _showAreaProtegidaChk(),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _showNombreFinca() {
     return Container(
-      padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+      padding: EdgeInsets.only(top: 0.0, bottom: 10.0),
       child: TextField(
         //controller: _encuestadorController,
         decoration: InputDecoration(
@@ -249,6 +333,307 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
         onChanged: (value) {
           _codenc = value;
         },
+      ),
+    );
+  }
+
+  Widget _showUbicacionLabel() {
+    return Container(
+      margin: EdgeInsets.only(bottom: 10.0),
+      child: Text(
+        'Ubicación',
+        style: TextStyle(color: Colors.white, fontSize: 20.0),
+      ),
+    );
+  }
+
+  Widget _showComarca() {
+    return Container(
+      padding: EdgeInsets.only(top: 0.0, bottom: 10.0),
+      child: TextField(
+        //controller: _encuestadorController,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          hintText: 'Comarca',
+          //errorText: _codencShowError ? _codencError : null,
+        ),
+        onChanged: (value) {
+          _codenc = value;
+        },
+      ),
+    );
+  }
+
+  Widget _showBarrioCaserio() {
+    return Container(
+      padding: EdgeInsets.only(top: 0.0, bottom: 10.0),
+      child: TextField(
+        //controller: _encuestadorController,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          hintText: 'Barrio o Caserio',
+          //errorText: _codencShowError ? _codencError : null,
+        ),
+        onChanged: (value) {
+          _codenc = value;
+        },
+      ),
+    );
+  }
+
+  Widget _showManzanaLote() {
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Expanded(
+            child: _showManzana(),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: _showLote(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _showManzana() {
+    return Container(
+      padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
+      child: TextField(
+        //controller: _encuestadorController,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          hintText: 'Manzana',
+          //errorText: _codencShowError ? _codencError : null,
+        ),
+        onChanged: (value) {
+          _codenc = value;
+        },
+      ),
+    );
+  }
+
+  Widget _showLote() {
+    return Container(
+      padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
+      child: TextField(
+        //controller: _encuestadorController,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          hintText: 'Lote',
+          //errorText: _codencShowError ? _codencError : null,
+        ),
+        onChanged: (value) {
+          _codenc = value;
+        },
+      ),
+    );
+  }
+
+  Widget _showTipoUsoLabel() {
+    return Container(
+      margin: EdgeInsets.only(bottom: 10.0),
+      child: Text(
+        'Tipo de Uso',
+        style: TextStyle(color: Colors.white, fontSize: 20.0),
+      ),
+    );
+  }
+
+  Widget _showTipoUsoChk() {
+    return Container(
+      margin: EdgeInsets.only(top: 0.0, bottom: 10.0),
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(10)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Expanded(
+            child: _showAreaProtegidaChk(),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: _showAreaProtegidaChk(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _showDescripcion() {
+    return Container(
+      padding: EdgeInsets.only(top: 0.0, bottom: 10.0),
+      child: TextField(
+        //controller: _encuestadorController,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          hintText: 'Descripcion',
+          //errorText: _codencShowError ? _codencError : null,
+        ),
+        onChanged: (value) {
+          _codenc = value;
+        },
+      ),
+    );
+  }
+
+  Widget _showAreaEstimada() {
+    return Container(
+      padding: EdgeInsets.only(bottom: 10.0),
+      child: TextField(
+        keyboardType:
+            TextInputType.numberWithOptions(decimal: true, signed: false),
+        controller: _areaEstimadaController,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          hintText: 'Area Estimada',
+          errorText: _areaEstimadaShowError ? _areaEstimadaError : null,
+        ),
+        onChanged: (value) {
+          _areaEstimada = value;
+        },
+      ),
+    );
+  }
+
+  Widget _showOrigenTierraLabel() {
+    return Container(
+      margin: EdgeInsets.only(bottom: 10.0),
+      child: Text(
+        'Origen de la Tierra',
+        style: TextStyle(color: Colors.white, fontSize: 20.0),
+      ),
+    );
+  }
+
+  Widget _showOrigenTierraChk() {
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(10)),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                child: _showAreaProtegidaChk(),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: _showAreaProtegidaChk(),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                child: _showAreaProtegidaChk(),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: _showAreaProtegidaChk(),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                child: _showAreaProtegidaChk(),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: _showAreaProtegidaChk(),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                child: _showAreaProtegidaChk(),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: _showAreaProtegidaChk(),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                child: _showAreaProtegidaChk(),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: _showAreaProtegidaChk(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _showAreaProtegidaChk() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 35.0, vertical: 0.0),
+      child: CheckboxListTile(
+          activeColor: Colors.green,
+          title: Text(
+            'Areas Protegidas',
+            style: TextStyle(color: Colors.black),
+          ),
+          value: _areaProtegida,
+          onChanged: (value) {
+            setState(() {
+              _areaProtegida = value!;
+            });
+          }),
+    );
+  }
+
+  Widget _showDatosEntrevistadoTitle() {
+    return Container(
+      margin: EdgeInsets.only(top: 10.0, bottom: 10.0),
+      child: Text(
+        'DATOS DEL ENTREVISTADO',
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.white, fontSize: 20.0),
       ),
     );
   }
@@ -336,30 +721,6 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
         ),
         onChanged: (value) {
           _codenc = value;
-        },
-      ),
-    );
-  }
-
-  Widget _showAreaEstimada() {
-    return Container(
-      padding: EdgeInsets.only(bottom: 10.0),
-      child: TextField(
-        keyboardType:
-            TextInputType.numberWithOptions(decimal: true, signed: false),
-        controller: _areaEstimadaController,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: Colors.grey[100],
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none,
-          ),
-          hintText: 'Area Estimada',
-          errorText: _areaEstimadaShowError ? _areaEstimadaError : null,
-        ),
-        onChanged: (value) {
-          _areaEstimada = value;
         },
       ),
     );
@@ -526,7 +887,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     };
 
     Response response =
-        await ApiHelper.post('/api/Parcelas/', request, widget.token.token);
+        await ApiHelper.post('/api/Parcelas/', request, widget.token);
 
     setState(() {
       _showLoader = false;
@@ -557,8 +918,8 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
       'areaEstimada': double.parse(_areaEstimada),
     };
 
-    Response response = await ApiHelper.put('/api/Parcelas/',
-        widget.parcela.id.toString(), request, widget.token.token);
+    Response response = await ApiHelper.put(
+        '/api/Parcelas/', widget.parcela.id.toString(), request, widget.token);
 
     setState(() {
       _showLoader = false;
@@ -576,5 +937,47 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     }
 
     Navigator.pop(context, 'yes');
+  }
+
+  Future<Null> _getDepartamentos() async {
+    setState(() {
+      _showLoader = true;
+    });
+
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        _showLoader = false;
+      });
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: 'Verifica que estes conectado a internet.',
+          actions: <AlertDialogAction>[
+            AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return;
+    }
+
+    Response response = await ApiHelper.getDepartamentos(widget.token);
+
+    setState(() {
+      _showLoader = false;
+    });
+
+    if (!response.isSuccess) {
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: response.message,
+          actions: <AlertDialogAction>[
+            AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return;
+    }
+
+    setState(() {
+      _departamentos = response.result;
+    });
   }
 }

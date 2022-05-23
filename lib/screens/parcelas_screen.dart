@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
 import 'package:surveycat_app/components/loader_component.dart';
@@ -7,6 +8,7 @@ import 'package:surveycat_app/helpers/api_helper.dart';
 import 'package:surveycat_app/models/parcela.dart';
 import 'package:surveycat_app/models/response.dart';
 import 'package:surveycat_app/models/token.dart';
+import 'package:surveycat_app/models/user.dart';
 import 'package:surveycat_app/screens/parcela_screen.dart';
 
 class ParcelasScreen extends StatefulWidget {
@@ -23,11 +25,14 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
   bool _showLoader = false;
   bool _isFiltered = false;
   String _search = '';
+  late User _user;
 
   @override
   void initState() {
     super.initState();
-    _getParcelas();
+    _user = widget.token.user;
+    //_getParcelas();
+    _getUser();
   }
 
   @override
@@ -54,6 +59,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
+        backgroundColor: Colors.blue[700],
         onPressed: () {
           _goAdd();
         },
@@ -66,7 +72,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
       _showLoader = true;
     });
 
-    Response response = await ApiHelper.getParcelas(widget.token.token);
+    Response response = await ApiHelper.getParcelas(widget.token);
 
     setState(() {
       _showLoader = false;
@@ -89,7 +95,8 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
   }
 
   Widget _getContent() {
-    return _parcelas.length == 0 ? _noContent() : _getListView();
+    //return widget.token.user.parcelas.isEmpty ? _noContent() : _getListView();
+    return _user.parcelas.length == 0 ? _noContent() : _getListView();
   }
 
   Widget _noContent() {
@@ -100,7 +107,8 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
           _isFiltered
               ? 'No hay Encuestas con ese criterio de busqueda'
               : 'No hay parcelas registradas.',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
     );
@@ -108,9 +116,9 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
 
   Widget _getListView() {
     return RefreshIndicator(
-      onRefresh: _getParcelas,
+      onRefresh: _getUser,
       child: ListView(
-        children: _parcelas.map((e) {
+        children: _user.parcelas.map((e) {
           return Card(
             child: InkWell(
               onTap: () {
@@ -176,7 +184,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
     setState(() {
       _isFiltered = false;
     });
-    _getParcelas();
+    _getUser();
   }
 
   void _filter() {
@@ -205,6 +213,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
       MaterialPageRoute(
         builder: (context) => ParcelaScreen(
             token: widget.token,
+            user: widget.token.user,
             parcela: Parcela(
                 id: 0,
                 codEnc: '',
@@ -216,7 +225,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
     );
 
     if (result == 'yes') {
-      _getParcelas();
+      _getUser();
     }
   }
 
@@ -226,13 +235,56 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
       MaterialPageRoute(
         builder: (context) => ParcelaScreen(
           token: widget.token,
+          user: widget.token.user,
           parcela: parcela,
         ),
       ),
     );
 
     if (result == 'yes') {
-      _getParcelas();
+      _getUser();
     }
+  }
+
+  Future<Null> _getUser() async {
+    setState(() {
+      _showLoader = true;
+    });
+
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        _showLoader = false;
+      });
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: 'Verifica que estes conectado a internet.',
+          actions: <AlertDialogAction>[
+            AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return;
+    }
+
+    Response response = await ApiHelper.getUser(widget.token, _user.id);
+
+    setState(() {
+      _showLoader = false;
+    });
+
+    if (!response.isSuccess) {
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: response.message,
+          actions: <AlertDialogAction>[
+            AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return;
+    }
+
+    setState(() {
+      _user = response.result;
+    });
   }
 }

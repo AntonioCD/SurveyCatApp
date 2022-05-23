@@ -38,6 +38,8 @@ dependencies:
   http: ^0.13.4
   adaptive_dialog: ^1.6.1
   flutter_titled_container: ^1.0.7
+  connectivity_plus: ^2.3.0
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_test:

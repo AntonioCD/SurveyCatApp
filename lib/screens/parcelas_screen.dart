@@ -10,6 +10,7 @@ import 'package:surveycat_app/models/response.dart';
 import 'package:surveycat_app/models/token.dart';
 import 'package:surveycat_app/models/user.dart';
 import 'package:surveycat_app/screens/parcela_screen.dart';
+import 'package:surveycat_app/screens/propietarios_screen.dart';
 
 class ParcelasScreen extends StatefulWidget {
   final Token token;
@@ -122,7 +123,8 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
           return Card(
             child: InkWell(
               onTap: () {
-                _goEdit(e);
+                //_goEdit(e);
+                _showOptions(e);
               },
               child: Container(
                 margin: EdgeInsets.all(10),
@@ -134,7 +136,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                       e.codEnc,
                       style: TextStyle(fontSize: 20),
                     ),
-                    Icon(Icons.arrow_circle_right),
+                    Icon(Icons.more_vert),
                   ],
                 ),
               ),
@@ -220,7 +222,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                 areaEstimada: 0,
                 presentaConflicto: false,
                 fechaEnc: '',
-                propietarios: [])),
+                catPersonasNaturales: [])),
       ),
     );
 
@@ -236,6 +238,22 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
         builder: (context) => ParcelaScreen(
           token: widget.token,
           user: widget.token.user,
+          parcela: parcela,
+        ),
+      ),
+    );
+
+    if (result == 'yes') {
+      _getUser();
+    }
+  }
+
+  void _goPropietarios(Parcela parcela) async {
+    String? result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PropietariosScreen(
+          token: widget.token,
           parcela: parcela,
         ),
       ),
@@ -286,5 +304,31 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
     setState(() {
       _user = response.result;
     });
+  }
+
+  _showOptions(Parcela parcela) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.layers),
+                title: Text('Parcela'),
+                onTap: () {
+                  _goEdit(parcela);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.group),
+                title: Text('Propietarios'),
+                onTap: () {
+                  _goPropietarios(parcela);
+                },
+              ),
+            ],
+          );
+        });
   }
 }

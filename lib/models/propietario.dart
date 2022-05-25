@@ -27,40 +27,6 @@ class Propietario {
   double difAreasRP = 0.0;
   double difAreasDocLegal = 0.0;
   String expVinculo = '';
-  CatPersonaNatural catPersonaNatural = CatPersonaNatural(
-      id: 0,
-      codPar: '',
-      codEnc: '',
-      nombre1: '',
-      nombre2: '',
-      apellido1: '',
-      apellido2: '',
-      genero: '',
-      cedula: '',
-      edad: 0,
-      codDep: '',
-      codMun: '',
-      codBar: '',
-      domicilio: '',
-      nombreCompleto: '',
-      desmovilizado: 0,
-      descSectorReformado: '',
-      retirado: 0,
-      campesinoTradicional: 0,
-      otros: 0,
-      idColectivo: 0,
-      objNacionalidadID: 0,
-      estadoCivil: '',
-      objProfesionID: 0,
-      esPareja: false,
-      indicadorPareja: 0,
-      cantHijosF: 0,
-      cantHijosM: 0,
-      codCaserio: 0,
-      barrio: '',
-      comarca: '',
-      caserio: '',
-      profesion: '');
 
   Propietario(
       {required this.id,
@@ -86,8 +52,7 @@ class Propietario {
       required this.cedula,
       required this.difAreasRP,
       required this.difAreasDocLegal,
-      required this.expVinculo,
-      required this.catPersonaNatural});
+      required this.expVinculo});
 
   Propietario.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -114,7 +79,6 @@ class Propietario {
     difAreasRP = json['difAreasRP'];
     difAreasDocLegal = json['difAreasDocLegal'];
     expVinculo = json['expVinculo'];
-    catPersonaNatural = CatPersonaNatural.fromJson(json['catPersonaNatural']);
   }
 
   Map<String, dynamic> toJson() {
@@ -143,7 +107,6 @@ class Propietario {
     data['difAreasRP'] = this.difAreasRP;
     data['difAreasDocLegal'] = this.difAreasDocLegal;
     data['expVinculo'] = this.expVinculo;
-    data['catPersonaNatural'] = this.catPersonaNatural.toJson();
     return data;
   }
 }

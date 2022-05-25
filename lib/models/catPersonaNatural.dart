@@ -1,3 +1,5 @@
+import 'package:surveycat_app/models/propietario.dart';
+
 class CatPersonaNatural {
   int id = 0;
   String codPar = '';
@@ -32,6 +34,31 @@ class CatPersonaNatural {
   String comarca = '';
   String caserio = '';
   String profesion = '';
+  Propietario propietario = Propietario(
+      id: 0,
+      codPar: '',
+      codEnc: '',
+      ruc: '',
+      relaxParcelas: '',
+      numComDerecho: 0.0,
+      presentaDocum: false,
+      codDocum: '',
+      autorNotario: '',
+      fechaDocum: DateTime.now(),
+      areaTitulada: 0.0,
+      uniMed: '',
+      aFavorDe: '',
+      relaxPoseedor: '',
+      fechaAdquisicion: DateTime.now(),
+      registroFecha: DateTime.now(),
+      registroNumFinca: '',
+      registroTomo: '',
+      registroFolio: '',
+      registroAsiento: '',
+      cedula: '',
+      difAreasRP: 0.0,
+      difAreasDocLegal: 0.0,
+      expVinculo: '');
 
   CatPersonaNatural(
       {required this.id,
@@ -66,7 +93,8 @@ class CatPersonaNatural {
       required this.barrio,
       required this.comarca,
       required this.caserio,
-      required this.profesion});
+      required this.profesion,
+      required this.propietario});
 
   CatPersonaNatural.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -102,6 +130,7 @@ class CatPersonaNatural {
     comarca = json['comarca'];
     caserio = json['caserio'];
     profesion = json['profesion'];
+    propietario = Propietario.fromJson(json['propietario']);
   }
 
   Map<String, dynamic> toJson() {
@@ -139,6 +168,7 @@ class CatPersonaNatural {
     data['comarca'] = this.comarca;
     data['caserio'] = this.caserio;
     data['profesion'] = this.profesion;
+    data['propietario'] = this.propietario.toJson();
     return data;
   }
 }

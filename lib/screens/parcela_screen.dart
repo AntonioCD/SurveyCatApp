@@ -41,20 +41,55 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
   bool _municipioCodMunShowError = false;
   List<CatDepartamento> _municipios = [];
 
+  String _sector = '';
+  String _sectorError = '';
+  bool _sectorShowError = false;
+  TextEditingController _sectorController = TextEditingController();
+
   String _codenc = '';
   String _codencError = '';
   bool _codencShowError = false;
   TextEditingController _codencController = TextEditingController();
 
-  String _encuestador = '';
-  String _encuestadorError = '';
-  bool _encuestadorShowError = false;
-  TextEditingController _encuestadorController = TextEditingController();
+  String _nombreFinca = '';
+  String _nombreFincaError = '';
+  bool _nombreFincaShowError = false;
+  TextEditingController _nombreFincaController = TextEditingController();
+
+  String _comarca = '';
+  String _comarcaError = '';
+  bool _comarcaShowError = false;
+  TextEditingController _comarcaController = TextEditingController();
+
+  String _barrioCaserio = '';
+  String _barrioCaserioError = '';
+  bool _barrioCaserioShowError = false;
+  TextEditingController _barrioCaserioController = TextEditingController();
+
+  String _manzana = '';
+  String _manzanaError = '';
+  bool _manzanaShowError = false;
+  TextEditingController _manzanaController = TextEditingController();
+
+  String _lote = '';
+  String _loteError = '';
+  bool _loteShowError = false;
+  TextEditingController _loteController = TextEditingController();
+
+  String _descripcion = '';
+  String _descripcionError = '';
+  bool _descripcionShowError = false;
+  TextEditingController _descripcionController = TextEditingController();
 
   String _areaEstimada = '';
   String _areaEstimadaError = '';
   bool _areaEstimadaShowError = false;
   TextEditingController _areaEstimadaController = TextEditingController();
+
+  String _encuestador = '';
+  String _encuestadorError = '';
+  bool _encuestadorShowError = false;
+  TextEditingController _encuestadorController = TextEditingController();
 
   bool _areaProtegida = false;
 
@@ -62,12 +97,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
   void initState() {
     super.initState();
 
-    _getDepartamentos();
-
-    _codenc = widget.parcela.codEnc;
-    _codencController.text = _codenc;
-    _areaEstimada = widget.parcela.areaEstimada.toString();
-    _areaEstimadaController.text = _areaEstimada;
+    _loadData();
   }
 
   @override
@@ -96,10 +126,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
                   ),
                 ),
                 _showDepartamentoMunicipio(),
-                _showDepartamentos(),
-                _showMunicipios(),
-                _showSector(),
-                _showCodEnc(),
+                _showSectorEncuesta(),
                 SizedBox(height: 20),
                 Container(
                   margin: EdgeInsets.only(bottom: 10.0),
@@ -132,6 +159,23 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
                   text: 'Por favor espere...',
                 )
               : Container(),
+        ],
+      ),
+    );
+  }
+
+  Widget _showDepartamentoMunicipio() {
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Expanded(
+            child: _showDepartamentos(),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: _showMunicipios(),
+          ),
         ],
       ),
     );
@@ -184,23 +228,6 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     return list;
   }
 
-  Widget _showDepartamentoMunicipio() {
-    return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Expanded(
-            child: _showDepartamentos(),
-          ),
-          SizedBox(width: 10),
-          Expanded(
-            child: _showMunicipios(),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _showMunicipios() {
     return Container(
         margin: EdgeInsets.only(bottom: 10.0),
@@ -250,11 +277,28 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     return list;
   }
 
+  Widget _showSectorEncuesta() {
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Expanded(
+            child: _showSector(),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: _showCodEnc(),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _showSector() {
     return Container(
-      margin: EdgeInsets.only(bottom: 10.0),
+      margin: EdgeInsets.only(bottom: 5.0),
       child: TextField(
-        //controller: _encuestadorController,
+        controller: _sectorController,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
@@ -263,10 +307,10 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Sector',
-          //errorText: _codencShowError ? _codencError : null,
+          errorText: _sectorShowError ? _sectorError : null,
         ),
         onChanged: (value) {
-          _codenc = value;
+          _sector = value;
         },
       ),
     );
@@ -274,7 +318,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
 
   Widget _showCodEnc() {
     return Container(
-      padding: EdgeInsets.only(bottom: 0.0),
+      margin: EdgeInsets.only(bottom: 5.0),
       child: TextField(
         autofocus: true,
         controller: _codencController,
@@ -319,7 +363,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     return Container(
       padding: EdgeInsets.only(top: 0.0, bottom: 10.0),
       child: TextField(
-        //controller: _encuestadorController,
+        controller: _nombreFincaController,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
@@ -328,10 +372,10 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Nombre de la Finca',
-          //errorText: _codencShowError ? _codencError : null,
+          errorText: _nombreFincaShowError ? _nombreFincaError : null,
         ),
         onChanged: (value) {
-          _codenc = value;
+          _nombreFinca = value;
         },
       ),
     );
@@ -351,7 +395,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     return Container(
       padding: EdgeInsets.only(top: 0.0, bottom: 10.0),
       child: TextField(
-        //controller: _encuestadorController,
+        controller: _comarcaController,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
@@ -360,10 +404,10 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Comarca',
-          //errorText: _codencShowError ? _codencError : null,
+          errorText: _comarcaShowError ? _comarcaError : null,
         ),
         onChanged: (value) {
-          _codenc = value;
+          _comarca = value;
         },
       ),
     );
@@ -373,7 +417,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     return Container(
       padding: EdgeInsets.only(top: 0.0, bottom: 10.0),
       child: TextField(
-        //controller: _encuestadorController,
+        controller: _barrioCaserioController,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
@@ -382,10 +426,10 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Barrio o Caserio',
-          //errorText: _codencShowError ? _codencError : null,
+          errorText: _barrioCaserioShowError ? _barrioCaserioError : null,
         ),
         onChanged: (value) {
-          _codenc = value;
+          _barrioCaserio = value;
         },
       ),
     );
@@ -412,7 +456,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     return Container(
       padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
       child: TextField(
-        //controller: _encuestadorController,
+        controller: _manzanaController,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
@@ -421,10 +465,10 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Manzana',
-          //errorText: _codencShowError ? _codencError : null,
+          errorText: _manzanaShowError ? _manzanaError : null,
         ),
         onChanged: (value) {
-          _codenc = value;
+          _manzana = value;
         },
       ),
     );
@@ -434,7 +478,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     return Container(
       padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
       child: TextField(
-        //controller: _encuestadorController,
+        controller: _loteController,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
@@ -443,10 +487,10 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Lote',
-          //errorText: _codencShowError ? _codencError : null,
+          errorText: _loteShowError ? _loteError : null,
         ),
         onChanged: (value) {
-          _codenc = value;
+          _lote = value;
         },
       ),
     );
@@ -486,7 +530,7 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     return Container(
       padding: EdgeInsets.only(top: 0.0, bottom: 10.0),
       child: TextField(
-        //controller: _encuestadorController,
+        controller: _descripcionController,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
@@ -495,10 +539,10 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
             borderSide: BorderSide.none,
           ),
           hintText: 'Descripcion',
-          //errorText: _codencShowError ? _codencError : null,
+          errorText: _descripcionShowError ? _descripcionError : null,
         ),
         onChanged: (value) {
-          _codenc = value;
+          _descripcion = value;
         },
       ),
     );
@@ -979,5 +1023,22 @@ class _ParcelaScreenState extends State<ParcelaScreen> {
     setState(() {
       _departamentos = response.result;
     });
+  }
+
+  void _loadData() async {
+    await _getDepartamentos();
+
+    _loadFieldValues();
+  }
+
+  void _loadFieldValues() {
+    /*  _vehicleTypeId = widget.vehicle.vehicleType.id;
+    _brandId = widget.vehicle.brand.id; */
+
+    _codenc = widget.parcela.codEnc;
+    _codencController.text = _codenc;
+
+    _areaEstimada = widget.parcela.areaEstimada.toString();
+    _areaEstimadaController.text = _areaEstimada;
   }
 }

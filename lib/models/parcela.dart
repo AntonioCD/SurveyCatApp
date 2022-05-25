@@ -1,3 +1,4 @@
+import 'package:surveycat_app/models/catPersonaNatural.dart';
 import 'package:surveycat_app/models/propietario.dart';
 
 class Parcela {
@@ -6,7 +7,7 @@ class Parcela {
   double areaEstimada = 0;
   bool presentaConflicto = false;
   String fechaEnc = '';
-  List<Propietario> propietarios = [];
+  List<CatPersonaNatural> catPersonasNaturales = [];
 
   Parcela(
       {required this.id,
@@ -14,7 +15,7 @@ class Parcela {
       required this.areaEstimada,
       required this.presentaConflicto,
       required this.fechaEnc,
-      required this.propietarios});
+      required this.catPersonasNaturales});
 
   Parcela.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -22,10 +23,10 @@ class Parcela {
     areaEstimada = _checkDouble(json['areaEstimada']);
     presentaConflicto = json['presenta_Conflicto'];
     fechaEnc = json['fecha_Enc'];
-    if (json['propietarios'] != null) {
-      propietarios = [];
-      json['propietarios'].forEach((v) {
-        propietarios.add(new Propietario.fromJson(v));
+    if (json['catPersonasNaturales'] != null) {
+      catPersonasNaturales = [];
+      json['catPersonasNaturales'].forEach((v) {
+        catPersonasNaturales.add(new CatPersonaNatural.fromJson(v));
       });
     }
   }
@@ -37,7 +38,8 @@ class Parcela {
     data['areaEstimada'] = this.areaEstimada;
     data['presenta_Conflicto'] = this.presentaConflicto;
     data['fecha_Enc'] = this.fechaEnc;
-    data['propietarios'] = this.propietarios.map((v) => v.toJson()).toList();
+    data['catPersonasNaturales'] =
+        this.catPersonasNaturales.map((v) => v.toJson()).toList();
     return data;
   }
 

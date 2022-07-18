@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:surveycat_app/helpers/database_helper.dart';
 import 'package:surveycat_app/models/token.dart';
 import 'package:surveycat_app/screens/login_screen.dart';
 import 'package:surveycat_app/screens/parcelas_screen.dart';
@@ -21,8 +22,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Color.fromARGB(8, 15, 15, 15),
       appBar: AppBar(
-        title: Text('SurveyCat'),
-        backgroundColor: Color.fromARGB(255, 0, 133, 138),
+        title: Text('SurveyCAT'),
+        titleTextStyle: TextStyle(fontSize: 25.0),
+        backgroundColor: Color.fromARGB(255, 0, 70, 136),
       ),
       body: _getBody(),
       drawer: widget.token.user.userType == 0
@@ -80,13 +82,27 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         ListTile(
-          leading: Icon(Icons.other_houses),
-          title: Text('Inicio'),
-          onTap: () {},
+          leading: Icon(
+            Icons.other_houses,
+            size: 30.0,
+          ),
+          title: Text(
+            'Inicio',
+            style: TextStyle(fontSize: 17.0, color: Colors.grey[800]),
+          ),
+          onTap: () {
+            //DictionaryDataBaseHelper.init();
+          },
         ),
         ListTile(
-          leading: Icon(Icons.edit_note),
-          title: Text('Mis Encuestas'),
+          leading: Icon(
+            Icons.edit_note,
+            size: 30.0,
+          ),
+          title: Text(
+            'Mis Encuestas',
+            style: TextStyle(fontSize: 17.0, color: Colors.grey[800]),
+          ),
           onTap: () {
             Navigator.push(
               context,
@@ -98,16 +114,42 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
         ),
+        ListTile(
+          leading: Icon(
+            Icons.refresh_sharp,
+            size: 30.0,
+          ),
+          title: Text(
+            'Sincronizar Datos',
+            style: TextStyle(fontSize: 17.0, color: Colors.grey[800]),
+          ),
+          onTap: () {
+            /* Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ParcelasScreen(
+                  token: widget.token,
+                ),
+              ),
+            ); */
+          },
+        ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10.0),
+          padding: EdgeInsets.symmetric(horizontal: 15.0),
           child: Divider(
             color: Colors.black,
             height: 2,
           ),
         ),
         ListTile(
-          leading: Icon(Icons.transit_enterexit),
-          title: Text('Cerrar Sesión'),
+          leading: Icon(
+            Icons.transit_enterexit,
+            size: 30.0,
+          ),
+          title: Text(
+            'Cerrar Sesión',
+            style: TextStyle(fontSize: 17.0, color: Colors.grey[800]),
+          ),
           onTap: () => _logOut(),
         ),
       ]),

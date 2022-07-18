@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:surveycat_app/models/parcela.dart';
+import 'package:surveycat_app/models/relacionConParcela.dart';
 
 import 'package:surveycat_app/models/response.dart';
 import '../models/catDepartamento.dart';
@@ -36,6 +37,39 @@ class ApiHelper {
     if (decodedJson != null) {
       for (var item in decodedJson) {
         list.add(CatDepartamento.fromJson(item));
+      }
+    }
+
+    return Response(isSuccess: true, result: list);
+  }
+
+  static Future<Response> getRelacionesParcela(Token token) async {
+    if (!validToken(token)) {
+      return Response(
+          isSuccess: false,
+          message:
+              'Sus credenciales se han vencido, por favor cierre sesión y vuelva a ingresar al sistema.');
+    }
+    var url = Uri.parse('${Constants.apiUrl}/api/RelacionConParcelas');
+    var response = await http.get(
+      url,
+      headers: {
+        'content-type': 'application/json',
+        'accept': 'application/json',
+        'authorization': 'bearer ${token.token}',
+      },
+    );
+
+    var body = response.body;
+    if (response.statusCode >= 400) {
+      return Response(isSuccess: false, message: body);
+    }
+
+    List<RelacionConParcela> list = [];
+    var decodedJson = jsonDecode(body);
+    if (decodedJson != null) {
+      for (var item in decodedJson) {
+        list.add(RelacionConParcela.fromJson(item));
       }
     }
 

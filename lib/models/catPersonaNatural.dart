@@ -34,7 +34,8 @@ class CatPersonaNatural {
   String comarca = '';
   String caserio = '';
   String profesion = '';
-  Propietario propietario = Propietario(
+
+  /*  Propietario propietario = Propietario(
       id: 0,
       codPar: '',
       codEnc: '',
@@ -58,7 +59,7 @@ class CatPersonaNatural {
       cedula: '',
       difAreasRP: 0.0,
       difAreasDocLegal: 0.0,
-      expVinculo: '');
+      expVinculo: ''); */
 
   CatPersonaNatural(
       {required this.id,
@@ -93,8 +94,7 @@ class CatPersonaNatural {
       required this.barrio,
       required this.comarca,
       required this.caserio,
-      required this.profesion,
-      required this.propietario});
+      required this.profesion});
 
   CatPersonaNatural.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -130,7 +130,7 @@ class CatPersonaNatural {
     comarca = json['comarca'];
     caserio = json['caserio'];
     profesion = json['profesion'];
-    propietario = Propietario.fromJson(json['propietario']);
+    //propietario = Propietario.fromJson(json['propietario']);
   }
 
   Map<String, dynamic> toJson() {
@@ -168,7 +168,7 @@ class CatPersonaNatural {
     data['comarca'] = this.comarca;
     data['caserio'] = this.caserio;
     data['profesion'] = this.profesion;
-    data['propietario'] = this.propietario.toJson();
+    //data['propietario'] = this.propietario.toJson();
     return data;
   }
 }

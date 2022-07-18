@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,7 +9,20 @@ import 'package:surveycat_app/screens/login_screen.dart';
 import 'package:surveycat_app/screens/wait_screen.dart';
 import 'models/token.dart';
 
-void main() => runApp(MyApp());
+//void main() => runApp(MyApp());
+/* class PostHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+} */
+
+void main() {
+  //HttpOverrides.global = new PostHttpOverrides();
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);

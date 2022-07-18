@@ -28,6 +28,10 @@ class _LoginScreenState extends State<LoginScreen> {
   String _passwordError = '';
   bool _passwordShowError = false;
 
+  int _baseDatosId = 0;
+  String _baseDatosIdError = '';
+  bool _baseDatosIdShowError = false;
+
   bool _visibilityPassword = false;
   bool _rememberme = true;
 
@@ -48,6 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(fontSize: 35, color: Colors.white)), */
                 _showEmail(),
                 _showPassword(),
+                _showBaseDatosCombo(),
                 _showRememberme(),
                 SizedBox(height: 10),
                 _showButtons(),
@@ -73,17 +78,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _showEmail() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 50.0, vertical: 10.0),
+      margin: EdgeInsets.symmetric(horizontal: 50.0, vertical: 10.0),
       child: TextField(
         keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
-          fillColor: Colors.white,
+          focusedBorder: const OutlineInputBorder(
+            borderSide: const BorderSide(
+                color: Color.fromARGB(255, 1, 166, 172), width: 2.5),
+          ),
+          fillColor: Colors.grey[300],
           filled: true,
           hintText: 'Email',
           errorText: _emailShowError ? _emailError : null,
           suffixIcon: Icon(Icons.email),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
         ),
+        style: TextStyle(fontSize: 20.0, height: 1.0, color: Colors.black),
         onChanged: (value) {
           _email = value;
         },
@@ -93,11 +103,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _showPassword() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 50.0, vertical: 10.0),
+      margin: EdgeInsets.symmetric(horizontal: 50.0, vertical: 10.0),
       child: TextField(
         obscureText: !_visibilityPassword,
         decoration: InputDecoration(
-          fillColor: Colors.white,
+          focusedBorder: const OutlineInputBorder(
+            borderSide: const BorderSide(
+                color: Color.fromARGB(255, 1, 166, 172), width: 2.5),
+          ),
+          fillColor: Colors.grey[300],
           filled: true,
           hintText: 'Password',
           errorText: _passwordShowError ? _passwordError : null,
@@ -113,6 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
         ),
+        style: TextStyle(fontSize: 20.0, height: 1.0, color: Colors.black),
         onChanged: (value) {
           _password = value;
         },
@@ -120,20 +135,69 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget _showBaseDatosCombo() {
+    return Container(
+        margin: EdgeInsets.symmetric(horizontal: 50.0, vertical: 10.0),
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: getDropdownItemsGenero.length == 0
+            ? Text('Cargando Bases de Datos...')
+            : Container(
+                child: DropdownButtonFormField(
+                  dropdownColor: Colors.white,
+                  style: TextStyle(color: Colors.grey[800], fontSize: 20.0),
+                  items: getDropdownItemsGenero,
+                  value: _baseDatosId,
+                  onChanged: (option) {
+                    setState(() {
+                      _baseDatosId = option as int;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: const BorderSide(
+                          color: Color.fromARGB(255, 1, 166, 172), width: 2.5),
+                    ),
+                    errorText: _baseDatosIdShowError ? _baseDatosIdError : null,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ));
+  }
+
+  List<DropdownMenuItem<int>> get getDropdownItemsGenero {
+    List<DropdownMenuItem<int>> menuItems = [
+      DropdownMenuItem(child: Text("Seleccione la Base de Datos..."), value: 0),
+      DropdownMenuItem(child: Text("Barrido Tradicional"), value: 1),
+      //DropdownMenuItem(child: Text("Titulacion Temprana"), value: 2),
+    ];
+    return menuItems;
+  }
+
   Widget _showRememberme() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 35.0, vertical: 0.0),
-      child: CheckboxListTile(
-          title: Text(
-            'Recordarme',
-            style: TextStyle(color: Colors.white),
-          ),
-          value: _rememberme,
-          onChanged: (value) {
-            setState(() {
-              _rememberme = value!;
-            });
-          }),
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          unselectedWidgetColor: Colors.grey,
+        ),
+        child: CheckboxListTile(
+            activeColor: Colors.blue,
+            title: Text(
+              'Recordarme',
+              style: TextStyle(color: Colors.white, fontSize: 20.0),
+            ),
+            value: _rememberme,
+            onChanged: (value) {
+              setState(() {
+                _rememberme = value!;
+              });
+            }),
+      ),
     );
   }
 
@@ -143,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           textStyle: const TextStyle(fontSize: 20),
-          primary: Color.fromARGB(255, 0, 133, 138),
+          primary: Color.fromARGB(255, 0, 70, 136),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
@@ -154,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
           alignment: Alignment.center,
           child: Text(
             "Iniciar Sesión",
-            style: TextStyle(color: Colors.grey[100]),
+            style: TextStyle(color: Colors.white, fontSize: 20.0),
           ),
         ),
       ),
@@ -259,6 +323,14 @@ class _LoginScreenState extends State<LoginScreen> {
       _passwordShowError = false;
     }
 
+    if (_baseDatosId == 0) {
+      isValid = false;
+      //_baseDatosIdShowError = true;
+      //_baseDatosIdError = '';
+    } /* else {
+      //_baseDatosIdShowError = false;
+    }
+  */
     setState(() {});
     return isValid;
   }
